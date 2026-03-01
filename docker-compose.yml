@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: meetings
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: ./web
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/meetings
+      - FLASK_ENV=development
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./web:/app
+
+volumes:
+  db_data:

@@ -35,6 +35,26 @@ def login():
         flash('Invalid credentials')
     return render_template('login.html')
 
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password']
+        if not username or not password:
+            flash('Inserisci username e password')
+            return render_template('register.html')
+        if User.query.filter_by(username=username).first():
+            flash('Username già presente')
+            return render_template('register.html')
+        pw_hash = generate_password_hash(password)
+        u = User(username=username, password_hash=pw_hash)
+        db.session.add(u)
+        db.session.commit()
+        login_user(u)
+        return redirect(url_for('bookings'))
+    return render_template('register.html')
+
 @app.route('/logout')
 @login_required
 def logout():
